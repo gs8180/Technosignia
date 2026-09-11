@@ -7,6 +7,10 @@
 .DS_Store
 Thumbs.db
 
+# Task & Notes
+All-Task.txt
+*.bak
+
 # Java & Maven
 **/target/
 **/*.class
