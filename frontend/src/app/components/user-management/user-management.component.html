@@ -1,0 +1,172 @@
+<div class="container">
+  <!-- Success Notification Toast -->
+  <div *ngIf="successToast" class="success-toast">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" color="#10b981">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span>{{ successToast }}</span>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">User & Role Management</h1>
+      <p class="page-subtitle">Configure system users, assign role-based permissions, and manage profile credentials</p>
+    </div>
+    <div class="header-actions">
+      <!-- Admin Self Profile Button -->
+      <button (click)="openSelfProfile()" class="btn btn-secondary" title="Update my administrator profile & password">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Edit My Profile
+      </button>
+
+      <button (click)="openAddModal()" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add New User
+      </button>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Assigned Role</th>
+          <th>Status</th>
+          <th>Created Date</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="8" class="table-empty">Loading user accounts...</td>
+        </tr>
+        <tr *ngFor="let user of users" [class.highlight-self-row]="isCurrentUser(user)">
+          <td>{{ user.id }}</td>
+          <td>
+            <strong>{{ user.fullName }}</strong>
+            <span *ngIf="isCurrentUser(user)" class="self-badge">YOU</span>
+          </td>
+          <td><code>{{ user.username }}</code></td>
+          <td>{{ user.email }}</td>
+          <td>
+            <span class="user-role-badge" [ngClass]="'role-' + user.role.toLowerCase()">
+              {{ formatRole(user.role) }}
+            </span>
+          </td>
+          <td>
+            <span class="status-indicator" [class.active-status]="user.active" [class.inactive-status]="!user.active">
+              {{ user.active ? 'ACTIVE' : 'INACTIVE' }}
+            </span>
+          </td>
+          <td>{{ user.createdAt | date:'mediumDate' }}</td>
+          <td style="text-align: right;">
+            <div class="actions-group">
+              <button (click)="openEditModal(user)" class="btn btn-secondary btn-sm">
+                {{ isCurrentUser(user) ? 'Edit Profile' : 'Edit / Role' }}
+              </button>
+              <button *ngIf="!isCurrentUser(user)" (click)="deleteUser(user)" class="btn btn-danger btn-sm">
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add / Edit User Modal -->
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>{{ isSelfProfile ? 'Edit My Administrator Profile' : (isEditMode ? 'Edit User & Role Assignment' : 'Create New User') }}</h3>
+      <button type="button" class="btn-icon" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="modalError" class="error-alert">{{ modalError }}</div>
+
+      <div class="self-edit-notice" *ngIf="isSelfProfile">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="#4f46e5">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>You are updating your logged-in administrator profile. Changes will immediately sync across your session.</span>
+      </div>
+
+      <div class="form-group" *ngIf="!isEditMode">
+        <label class="form-label">Username *</label>
+        <input type="text" class="form-control" [(ngModel)]="formUsername" placeholder="e.g. john_doe" />
+      </div>
+
+      <div class="form-group" *ngIf="isEditMode">
+        <label class="form-label">Username (System Identifier)</label>
+        <input type="text" class="form-control" [value]="formUsername" disabled style="background: #f1f5f9; cursor: not-allowed;" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input type="text" class="form-control" [(ngModel)]="formFullName" placeholder="e.g. System Administrator" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address *</label>
+        <input type="email" class="form-control" [(ngModel)]="formEmail" placeholder="e.g. admin@technosignia.com" />
+      </div>
+
+      <!-- Password Field (Temporary for new user, Optional update for edit mode) -->
+      <div class="form-group" *ngIf="!isEditMode">
+        <label class="form-label">Initial Password *</label>
+        <input type="password" class="form-control" [(ngModel)]="formPassword" placeholder="••••••••" />
+      </div>
+
+      <div class="form-group" *ngIf="isEditMode">
+        <label class="form-label">Update Password (Optional)</label>
+        <input type="password" class="form-control" [(ngModel)]="formPassword" placeholder="Leave blank to keep current password" />
+        <small class="form-hint">Enter a new password only if you wish to reset or change it.</small>
+      </div>
+
+      <div class="form-group" *ngIf="!isSelfProfile">
+        <label class="form-label">Assign Role (RBAC) *</label>
+        <select class="form-control" [(ngModel)]="formRole">
+          <option value="ROLE_ADMIN">Administrator (Full Access)</option>
+          <option value="ROLE_CONTRACT_MANAGER">Contract Manager (Contracts & Clauses)</option>
+          <option value="ROLE_APPROVER">Legal Approver (Review & Diff Approval)</option>
+          <option value="ROLE_USER">Client / Internal User (Propose Modifications)</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="isSelfProfile">
+        <label class="form-label">Assigned Role</label>
+        <input type="text" class="form-control" value="Administrator (ROLE_ADMIN)" disabled style="background: #f1f5f9; cursor: not-allowed;" />
+      </div>
+
+      <div class="form-group" *ngIf="isEditMode && !isSelfProfile">
+        <label class="form-label">Account Active Status</label>
+        <select class="form-control" [(ngModel)]="formActive">
+          <option [ngValue]="true">Active</option>
+          <option [ngValue]="false">Inactive / Suspended</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="saveUser()">
+        {{ isSelfProfile ? 'Update My Profile' : (isEditMode ? 'Save Changes' : 'Create User') }}
+      </button>
+    </div>
+  </div>
+</div>

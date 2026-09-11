@@ -1,0 +1,110 @@
+.filter-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.req-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.contract-sub {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+.clause-pill {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.contract-pill {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.review-modal {
+  max-width: 800px;
+}
+
+.review-meta-box {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 0.75rem;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  font-size: 0.8125rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .review-meta-box {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.meta-label {
+  color: var(--gray-500);
+  display: block;
+}
+
+.reason-banner {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-md);
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.reason-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1e40af;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.reason-text {
+  font-size: 0.875rem;
+  color: #1e3a8a;
+  font-style: italic;
+}
+
+.diff-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.diff-body-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.existing-review-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.review-by-text {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-top: 0.5rem;
+}

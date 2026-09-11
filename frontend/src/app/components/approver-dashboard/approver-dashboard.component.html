@@ -1,0 +1,237 @@
+<div class="container">
+  <div class="page-header">
+    <div>
+      <div class="role-pill">
+        <span class="role-dot"></span>
+        APPROVER WORKSPACE
+      </div>
+      <h1 class="page-title">Modification Approval Dashboard</h1>
+      <p class="page-subtitle">Review proposed contract clause modifications, compare diffs, and approve or reject changes</p>
+    </div>
+
+    <!-- Toggle Pending vs All -->
+    <div class="filter-toggle">
+      <button
+        class="btn btn-sm"
+        [ngClass]="viewFilter === 'PENDING' ? 'btn-primary' : 'btn-secondary'"
+        (click)="viewFilter = 'PENDING'">
+        Pending Requests ({{ pendingRequests.length }})
+      </button>
+      <button
+        class="btn btn-sm"
+        [ngClass]="viewFilter === 'ALL' ? 'btn-primary' : 'btn-secondary'"
+        (click)="viewFilter = 'ALL'">
+        All Historical Requests ({{ allRequests.length }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Pending Requests Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Req ID</th>
+          <th>Contract</th>
+          <th>Target Clause</th>
+          <th>Requested By</th>
+          <th>Request Date</th>
+          <th>Status</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="7" class="table-empty">Loading pending modification requests...</td>
+        </tr>
+        <tr *ngIf="!loading && (viewFilter === 'PENDING' ? pendingRequests.length === 0 : allRequests.length === 0)">
+          <td colspan="7" class="table-empty">
+            <div class="empty-icon">✓</div>
+            <p>No modification requests found in this view.</p>
+          </td>
+        </tr>
+        <tr *ngFor="let req of (viewFilter === 'PENDING' ? pendingRequests : allRequests)">
+          <td>
+            <span class="req-id">#{{ req.id }}</span>
+          </td>
+          <td>
+            <strong>{{ req.contract.title }}</strong>
+            <div class="contract-sub">{{ req.contract.contractNumber }}</div>
+          </td>
+          <td>
+            <span *ngIf="req.clause" class="clause-pill">{{ req.clause.title }}</span>
+            <span *ngIf="!req.clause" class="contract-pill">Entire Contract</span>
+          </td>
+          <td>{{ req.requestedBy.fullName }}</td>
+          <td>{{ req.requestedAt | date:'mediumDate' }}</td>
+          <td>
+            <span class="badge" [ngClass]="'badge-' + req.status.toLowerCase()">
+              {{ req.status }}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <button (click)="openReview(req)" class="btn btn-primary btn-sm">
+              Review
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Detailed Review Modal with Side-by-Side Diff (Task 10) -->
+<div class="modal-backdrop" *ngIf="showReviewModal && selectedRequest">
+  <div class="modal-content review-modal">
+    <div class="modal-header">
+      <div>
+        <span class="badge" [ngClass]="'badge-' + selectedRequest.status.toLowerCase()">
+          {{ selectedRequest.status }}
+        </span>
+        <h3 style="margin-top: 0.25rem;">
+          Review Request #{{ selectedRequest.id }}: {{ selectedRequest.contract.title }}
+        </h3>
+      </div>
+      <button type="button" class="btn-icon" (click)="closeReview()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Request Meta -->
+      <div class="review-meta-box">
+        <div>
+          <span class="meta-label">Contract Number:</span>
+          <strong>{{ selectedRequest.contract.contractNumber }}</strong>
+        </div>
+        <div>
+          <span class="meta-label">Current Version:</span>
+          <strong>v{{ selectedRequest.contract.currentVersion }}</strong>
+        </div>
+        <div>
+          <span class="meta-label">Modification Target:</span>
+          <strong>{{ selectedRequest.requestType }}: {{ selectedRequest.clause ? selectedRequest.clause.title : 'Entire Contract' }}</strong>
+        </div>
+        <div>
+          <span class="meta-label">Requested By:</span>
+          <strong>{{ selectedRequest.requestedBy.fullName }} ({{ selectedRequest.requestedAt | date:'medium' }})</strong>
+        </div>
+      </div>
+
+      <!-- Business Rationale / Reason -->
+      <div class="reason-banner">
+        <span class="reason-label">Modification Reason:</span>
+        <p class="reason-text">"{{ selectedRequest.reason }}"</p>
+      </div>
+
+      <!-- Visual Side-by-Side Diff Comparison (Task 10.1) -->
+      <h4 class="diff-title">Side-by-Side Value Comparison:</h4>
+      <div class="diff-container">
+        <!-- Original Value -->
+        <div class="diff-box diff-original">
+          <div class="diff-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            Original Value
+          </div>
+          <div class="diff-body-text">
+            {{ selectedRequest.originalValue || '(No prior value recorded)' }}
+          </div>
+        </div>
+
+        <!-- Proposed Modified Value -->
+        <div class="diff-box diff-proposed">
+          <div class="diff-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            Proposed Modified Value
+          </div>
+          <div class="diff-body-text">
+            {{ selectedRequest.proposedValue }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Existing Review Feedback (If already approved/rejected) -->
+      <div *ngIf="selectedRequest.status !== 'PENDING'" class="existing-review-box">
+        <p *ngIf="selectedRequest.approverComment">
+          <strong>Approver Comment:</strong> {{ selectedRequest.approverComment }}
+        </p>
+        <p *ngIf="selectedRequest.rejectionReason" class="text-danger">
+          <strong>Rejection Reason:</strong> {{ selectedRequest.rejectionReason }}
+        </p>
+        <p class="review-by-text">
+          Decided by: {{ selectedRequest.reviewedBy?.fullName || 'Approver' }} on {{ selectedRequest.reviewedAt | date:'medium' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Modal Footer Actions (Task 10.3 & 10.4) -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeReview()">Close</button>
+
+      <ng-container *ngIf="selectedRequest.status === 'PENDING' && authService.isApprover()">
+        <button type="button" class="btn btn-danger" (click)="openRejectDialog()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          Reject Request
+        </button>
+        <button type="button" class="btn btn-success" (click)="openApproveDialog()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Approve Modification
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- Approve Confirmation Dialog with Comment -->
+<div class="modal-backdrop" *ngIf="showApproveModal">
+  <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-header">
+      <h3>Approve Modification</h3>
+      <button type="button" class="btn-icon" (click)="showApproveModal = false">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Approving this modification will automatically apply the changes to the contract and record a new version snapshot (e.g. v1.1).</p>
+      <div class="form-group" style="margin-top: 1rem;">
+        <label class="form-label">Approver Comments (Optional):</label>
+        <textarea class="form-control" [(ngModel)]="approveComment" placeholder="Add any approval notes or ratification details..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showApproveModal = false">Cancel</button>
+      <button type="button" class="btn btn-success" (click)="confirmApprove()">Confirm Approval</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reject Confirmation Dialog with Rejection Reason (Task 10.3) -->
+<div class="modal-backdrop" *ngIf="showRejectModal">
+  <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-header">
+      <h3 style="color: #b91c1c;">Reject Modification</h3>
+      <button type="button" class="btn-icon" (click)="showRejectModal = false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="rejectError" class="error-alert">{{ rejectError }}</div>
+      <p>Please specify why this proposed modification is being rejected. The reason will be permanently recorded in the audit log.</p>
+      <div class="form-group" style="margin-top: 1rem;">
+        <label class="form-label">Rejection Reason *:</label>
+        <textarea class="form-control" [(ngModel)]="rejectionReason" placeholder="e.g. Terms violate corporate compliance or financial policy..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showRejectModal = false">Cancel</button>
+      <button type="button" class="btn btn-danger" (click)="confirmReject()">Confirm Rejection</button>
+    </div>
+  </div>
+</div>

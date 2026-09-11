@@ -1,0 +1,426 @@
+<div class="container" *ngIf="contract">
+  <!-- Back Link & Header -->
+  <div class="detail-header-card card">
+    <div class="header-top">
+      <a routerLink="/contracts" class="back-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Contracts
+      </a>
+      <div class="badges-row">
+        <span class="version-tag">Version {{ contract.currentVersion }}</span>
+        <span class="badge" [ngClass]="'badge-' + contract.status.toLowerCase()">
+          {{ contract.status }}
+        </span>
+      </div>
+    </div>
+
+    <div class="header-main">
+      <div>
+        <span class="contract-no">{{ contract.contractNumber }}</span>
+        <h1 class="contract-title">{{ contract.title }}</h1>
+        <p class="contract-description">{{ contract.description }}</p>
+      </div>
+
+      <div class="header-actions">
+        <button (click)="openModificationModal()" class="btn btn-warning-solid">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          Request Modification
+        </button>
+      </div>
+    </div>
+
+    <div class="header-footer">
+      <span>Created by: <strong>{{ contract.createdBy?.fullName || 'System' }}</strong></span>
+      <span>•</span>
+      <span>Created: {{ contract.createdAt | date:'mediumDate' }}</span>
+      <span>•</span>
+      <span>Last Modified: {{ contract.updatedAt | date:'mediumDate' }}</span>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="tabs-nav">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'clauses'"
+      (click)="activeTab = 'clauses'">
+      Clauses ({{ clauses.length }})
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'documents'"
+      (click)="activeTab = 'documents'">
+      Documents ({{ documents.length }})
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'modifications'"
+      (click)="activeTab = 'modifications'">
+      Modification Requests ({{ modifications.length }})
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'versions'"
+      (click)="activeTab = 'versions'">
+      Version History ({{ versions.length }})
+    </button>
+  </div>
+
+  <!-- TAB 1: CLAUSES MANAGEMENT (Task 9) -->
+  <div *ngIf="activeTab === 'clauses'" class="tab-content">
+    <div class="tab-toolbar">
+      <div>
+        <h3>Contract Clauses</h3>
+        <p class="tab-subtitle">Organized terms and conditions with sequence ordering</p>
+      </div>
+      <button
+        *ngIf="authService.isManager() || authService.isAdmin()"
+        (click)="openAddClauseModal()"
+        class="btn btn-primary btn-sm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add Clause
+      </button>
+    </div>
+
+    <div *ngIf="clauses.length === 0" class="empty-state card">
+      <p>No clauses have been added to this contract yet.</p>
+    </div>
+
+    <div class="clauses-list">
+      <div *ngFor="let clause of clauses; let i = index" class="clause-card card">
+        <div class="clause-header">
+          <div class="clause-title-box">
+            <span class="clause-num">{{ clause.clauseOrder }}.</span>
+            <h4 class="clause-title">{{ clause.title }}</h4>
+          </div>
+
+          <div class="clause-actions">
+            <!-- Order sequence buttons -->
+            <div class="reorder-btns" *ngIf="authService.isManager() || authService.isAdmin()">
+              <button
+                type="button"
+                class="btn-icon-tiny"
+                [disabled]="i === 0"
+                (click)="moveClause(i, 'up')"
+                title="Move Up">
+                ▲
+              </button>
+              <button
+                type="button"
+                class="btn-icon-tiny"
+                [disabled]="i === clauses.length - 1"
+                (click)="moveClause(i, 'down')"
+                title="Move Down">
+                ▼
+              </button>
+            </div>
+
+            <!-- Propose Modification Button (Task 9) -->
+            <button
+              type="button"
+              (click)="openModificationModal(clause)"
+              class="btn btn-secondary btn-sm"
+              title="Propose changes to this clause">
+              Suggest Edit
+            </button>
+
+            <!-- Edit/Delete by Manager or Admin -->
+            <button
+              *ngIf="authService.isManager() || authService.isAdmin()"
+              type="button"
+              (click)="openEditClauseModal(clause)"
+              class="btn btn-secondary btn-sm">
+              Edit
+            </button>
+            <button
+              *ngIf="authService.isManager() || authService.isAdmin()"
+              type="button"
+              (click)="deleteClause(clause.id)"
+              class="btn btn-danger btn-sm">
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="clause-content">
+          <p>{{ clause.content }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: DOCUMENTS MANAGEMENT (Task 8 & 9) -->
+  <div *ngIf="activeTab === 'documents'" class="tab-content">
+    <div class="tab-toolbar">
+      <div>
+        <h3>Attached Legal Documents</h3>
+        <p class="tab-subtitle">Upload, view, and download digital legal contracts</p>
+      </div>
+    </div>
+
+    <!-- Upload Box -->
+    <div class="upload-card card" *ngIf="authService.isManager() || authService.isAdmin()">
+      <h4>Attach New Document</h4>
+      <div class="upload-controls">
+        <input type="file" (change)="onFileSelected($event)" class="form-control" />
+        <button
+          (click)="uploadFile()"
+          class="btn btn-primary"
+          [disabled]="!selectedFile || uploading">
+          <span *ngIf="!uploading">Upload Document</span>
+          <span *ngIf="uploading">Uploading...</span>
+        </button>
+      </div>
+      <div *ngIf="uploadError" class="error-alert">
+        {{ uploadError }}
+      </div>
+    </div>
+
+    <!-- Documents List -->
+    <div *ngIf="documents.length === 0" class="empty-state card">
+      <p>No document files uploaded for this contract.</p>
+    </div>
+
+    <div class="docs-grid" *ngIf="documents.length > 0">
+      <div *ngFor="let doc of documents" class="doc-card card">
+        <div class="doc-icon-box">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </div>
+        <div class="doc-meta">
+          <h4 class="doc-name" [title]="doc.originalFileName">{{ doc.originalFileName }}</h4>
+          <span class="doc-sub">{{ (doc.fileSize / 1024) | number:'1.0-1' }} KB • {{ doc.uploadedAt | date:'mediumDate' }}</span>
+        </div>
+        <div class="doc-actions">
+          <button (click)="downloadDoc(doc)" class="btn btn-primary btn-sm">
+            Download
+          </button>
+          <button
+            *ngIf="authService.isManager() || authService.isAdmin()"
+            (click)="deleteDoc(doc.id)"
+            class="btn btn-danger btn-sm">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: MODIFICATION REQUESTS (Task 9 & 10) -->
+  <div *ngIf="activeTab === 'modifications'" class="tab-content">
+    <div class="tab-toolbar">
+      <div>
+        <h3>Modification Requests</h3>
+        <p class="tab-subtitle">Change proposals, pending approval workflows, and historical audits</p>
+      </div>
+      <button (click)="openModificationModal()" class="btn btn-primary btn-sm">
+        + New Modification Request
+      </button>
+    </div>
+
+    <div *ngIf="modifications.length === 0" class="empty-state card">
+      <p>No modification requests have been submitted for this contract.</p>
+    </div>
+
+    <div class="mod-list" *ngIf="modifications.length > 0">
+      <div *ngFor="let mod of modifications" class="mod-card card">
+        <div class="mod-header">
+          <div class="mod-header-left">
+            <span class="badge" [ngClass]="'badge-' + mod.status.toLowerCase()">
+              {{ mod.status }}
+            </span>
+            <span class="mod-target-tag">{{ mod.requestType }}: {{ mod.clause ? mod.clause.title : 'Entire Contract' }}</span>
+          </div>
+          <span class="mod-date">Requested: {{ mod.requestedAt | date:'mediumDate' }}</span>
+        </div>
+
+        <!-- Diff / Comparison Block -->
+        <div class="diff-container">
+          <div class="diff-box diff-original">
+            <div class="diff-header">
+              <span>Original Value</span>
+            </div>
+            <div>{{ mod.originalValue || '(Empty)' }}</div>
+          </div>
+
+          <div class="diff-box diff-proposed">
+            <div class="diff-header">
+              <span>Proposed Modified Value</span>
+            </div>
+            <div>{{ mod.proposedValue }}</div>
+          </div>
+        </div>
+
+        <div class="mod-footer">
+          <p class="mod-reason"><strong>Justification / Reason:</strong> {{ mod.reason }}</p>
+          <div class="mod-meta-row">
+            <span>Requested by: <strong>{{ mod.requestedBy.fullName }}</strong></span>
+            <span *ngIf="mod.reviewedBy">
+              • Reviewed by: <strong>{{ mod.reviewedBy.fullName }}</strong> ({{ mod.reviewedAt | date:'short' }})
+            </span>
+            <span *ngIf="mod.approverComment" class="comment-pill">
+              Comment: "{{ mod.approverComment }}"
+            </span>
+            <span *ngIf="mod.rejectionReason" class="rejection-pill">
+              Rejection Reason: "{{ mod.rejectionReason }}"
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: VERSION HISTORY (Task 11) -->
+  <div *ngIf="activeTab === 'versions'" class="tab-content">
+    <div class="tab-toolbar">
+      <div>
+        <h3>Contract Version History</h3>
+        <p class="tab-subtitle">Version snapshots preserved automatically upon modification approval</p>
+      </div>
+    </div>
+
+    <div *ngIf="versions.length === 0" class="empty-state card">
+      <p>This contract is currently at initial version v{{ contract.currentVersion }}. New snapshots are generated when modifications are approved.</p>
+    </div>
+
+    <div class="version-timeline" *ngIf="versions.length > 0">
+      <div *ngFor="let ver of versions" class="version-card card">
+        <div class="version-header">
+          <div class="version-title-box">
+            <span class="version-badge">v{{ ver.versionNumber }}</span>
+            <h4 class="version-name">{{ ver.title }}</h4>
+          </div>
+          <span class="version-date">{{ ver.createdAt | date:'medium' }}</span>
+        </div>
+
+        <p class="version-summary">
+          <strong>Summary of Changes:</strong> {{ ver.changeSummary }}
+        </p>
+
+        <div class="version-footer">
+          <span>Snapshot created by: <strong>{{ ver.changedBy?.fullName || 'Legal Approver' }}</strong></span>
+          <button (click)="viewSnapshot(ver)" class="btn btn-secondary btn-sm">
+            Inspect Snapshot
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add / Edit Clause Modal -->
+<div class="modal-backdrop" *ngIf="showClauseModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>{{ isEditClause ? 'Edit Clause' : 'Add New Clause' }}</h3>
+      <button type="button" class="btn-icon" (click)="showClauseModal = false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="clauseModalError" class="error-alert">{{ clauseModalError }}</div>
+
+      <div class="form-group">
+        <label class="form-label">Clause Title *</label>
+        <input type="text" class="form-control" [(ngModel)]="clauseFormTitle" placeholder="e.g. Confidentiality Terms" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Clause Content *</label>
+        <textarea class="form-control" [(ngModel)]="clauseFormContent" placeholder="Enter formal legal language for this clause..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Sequence Order</label>
+        <input type="number" class="form-control" [(ngModel)]="clauseFormOrder" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showClauseModal = false">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="saveClause()">Save Clause</button>
+    </div>
+  </div>
+</div>
+
+<!-- Request Modification Modal (Task 9) -->
+<div class="modal-backdrop" *ngIf="showModModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Request Modification</h3>
+      <button type="button" class="btn-icon" (click)="showModModal = false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="modModalError" class="error-alert">{{ modModalError }}</div>
+
+      <div class="form-group">
+        <label class="form-label">Modification Target *</label>
+        <select class="form-control" [(ngModel)]="modTargetType" (change)="onModTargetChange()">
+          <option value="CLAUSE">Specific Clause</option>
+          <option value="CONTRACT">Entire Contract Terms</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="modTargetType === 'CLAUSE'">
+        <label class="form-label">Select Clause to Modify *</label>
+        <select class="form-control" [(ngModel)]="modSelectedClauseId" (change)="onModClauseSelectChange()">
+          <option *ngFor="let c of clauses" [value]="c.id">{{ c.clauseOrder }}. {{ c.title }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Current / Original Value</label>
+        <div class="original-preview-box">
+          {{ modOriginalValue || '(No current value)' }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Proposed Modified Value *</label>
+        <textarea class="form-control" [(ngModel)]="modProposedValue" placeholder="Enter your revised wording..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Justification / Reason for Modification *</label>
+        <textarea class="form-control" [(ngModel)]="modReason" placeholder="Explain the legal or business rationale for this proposed change..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showModModal = false">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="submitModification()">Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Version Snapshot Viewer Modal (Task 11) -->
+<div class="modal-backdrop" *ngIf="showSnapshotModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Snapshot for Version {{ selectedSnapshotVersion?.versionNumber }}</h3>
+      <button type="button" class="btn-icon" (click)="showSnapshotModal = false">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="snapshot-desc"><strong>Title:</strong> {{ selectedSnapshotVersion?.title }}</p>
+      <p class="snapshot-desc"><strong>Summary:</strong> {{ selectedSnapshotVersion?.changeSummary }}</p>
+      <p class="snapshot-desc"><strong>Captured At:</strong> {{ selectedSnapshotVersion?.createdAt | date:'medium' }}</p>
+
+      <h4 style="margin: 1rem 0 0.5rem 0;">Clauses Snapshot:</h4>
+      <div *ngIf="snapshotClauses.length === 0" class="empty-state">No clauses captured in this snapshot.</div>
+      <div *ngFor="let c of snapshotClauses" class="snapshot-clause-item">
+        <strong>{{ c.clauseOrder }}. {{ c.title }}</strong>
+        <p>{{ c.content }}</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showSnapshotModal = false">Close</button>
+    </div>
+  </div>
+</div>

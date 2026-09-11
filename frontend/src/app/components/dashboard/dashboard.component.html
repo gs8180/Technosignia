@@ -1,0 +1,189 @@
+<div class="container">
+  <!-- Role-Tailored Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="role-pill">
+        <span class="role-dot"></span>
+        {{ formatRole(authService.currentUserValue?.role) }} PORTAL
+      </div>
+      <h1 class="welcome-title">Welcome back, {{ authService.currentUserValue?.fullName }}!</h1>
+      <p class="welcome-desc">
+        <ng-container *ngIf="authService.isAdmin()">
+          Full system administrator workspace: oversee contracts, users, approvals, and legal audit trails.
+        </ng-container>
+        <ng-container *ngIf="authService.isManager() && !authService.isAdmin()">
+          Contract Management Portal: create contracts, attach documents, organize clauses, and track modifications.
+        </ng-container>
+        <ng-container *ngIf="authService.isApprover() && !authService.isAdmin()">
+          Legal Approver Dashboard: inspect side-by-side proposed modifications and authorize legal revisions.
+        </ng-container>
+        <ng-container *ngIf="!authService.isAdmin() && !authService.isManager() && !authService.isApprover()">
+          Client Representative Portal: inspect assigned legal contracts and propose clause modifications digitally.
+        </ng-container>
+      </p>
+    </div>
+    <div class="welcome-actions">
+      <a *ngIf="authService.isManager() || authService.isAdmin()" routerLink="/contracts" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Manage Contracts
+      </a>
+      <a *ngIf="authService.isApprover()" routerLink="/approvals" class="btn btn-warning-solid">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m9 11 3 3L22 4"></path>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        Review Approvals ({{ stats?.pendingModifications || 0 }})
+      </a>
+      <a routerLink="/contracts" class="btn btn-secondary">
+        Browse Repository
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Metrics Grid -->
+  <div class="metrics-grid">
+    <!-- Card 1: Total Contracts -->
+    <div class="kpi-card card-contracts">
+      <div class="kpi-header">
+        <span class="kpi-label">Total Contracts</span>
+        <div class="kpi-icon-box bg-indigo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ stats?.totalContracts || 0 }}</div>
+      <div class="kpi-footer">
+        <span class="kpi-subtext">Active: <strong>{{ stats?.activeContracts || 0 }}</strong> | Drafts: <strong>{{ stats?.draftContracts || 0 }}</strong></span>
+      </div>
+    </div>
+
+    <!-- Card 2: Active Contracts -->
+    <div class="kpi-card card-active">
+      <div class="kpi-header">
+        <span class="kpi-label">Active Legally</span>
+        <div class="kpi-icon-box bg-emerald">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-value text-emerald">{{ stats?.activeContracts || 0 }}</div>
+      <div class="kpi-footer">
+        <span class="kpi-subtext">Operating agreements in effect</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Pending Modifications -->
+    <div class="kpi-card card-pending" [class.highlight-pulse]="(stats?.pendingModifications || 0) > 0">
+      <div class="kpi-header">
+        <span class="kpi-label">Pending Approval</span>
+        <div class="kpi-icon-box bg-amber">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-value text-amber">{{ stats?.pendingModifications || 0 }}</div>
+      <div class="kpi-footer">
+        <span class="kpi-subtext">Approved: <strong>{{ stats?.approvedModifications || 0 }}</strong> | Rejected: <strong>{{ stats?.rejectedModifications || 0 }}</strong></span>
+      </div>
+    </div>
+
+    <!-- Card 4: Documents & Clauses -->
+    <div class="kpi-card card-docs">
+      <div class="kpi-header">
+        <span class="kpi-label">Clauses & Attachments</span>
+        <div class="kpi-icon-box bg-sky">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10"></path>
+            <path d="M6 10h10"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ stats?.totalClauses || 0 }}</div>
+      <div class="kpi-footer">
+        <span class="kpi-subtext">Clauses registered across {{ stats?.totalDocuments || 0 }} files</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Dual Modules -->
+  <div class="dashboard-columns">
+    <!-- Left Column: Pending Review or Contract Breakdown -->
+    <div class="card column-card">
+      <div class="card-header">
+        <div>
+          <h3>Pending Modifications Requiring Review</h3>
+          <p class="section-sub">Proposed clause adjustments pending formal approval</p>
+        </div>
+        <a *ngIf="authService.isApprover()" routerLink="/approvals" class="btn btn-secondary btn-sm">View All</a>
+      </div>
+
+      <div *ngIf="pendingRequests.length === 0" class="empty-state">
+        <div class="empty-icon">✓</div>
+        <p>No pending modifications currently require review.</p>
+      </div>
+
+      <div *ngIf="pendingRequests.length > 0" class="pending-list">
+        <div *ngFor="let req of pendingRequests" class="pending-item">
+          <div class="pending-info">
+            <div class="pending-top">
+              <span class="badge badge-pending">PENDING</span>
+              <span class="pending-type">{{ req.requestType }} MODIFICATION</span>
+            </div>
+            <h4 class="pending-contract">{{ req.contract.title }} ({{ req.contract.contractNumber }})</h4>
+            <p class="pending-clause" *ngIf="req.clause">Clause: <strong>{{ req.clause.title }}</strong></p>
+            <p class="pending-reason">Reason: {{ req.reason }}</p>
+            <div class="pending-meta">
+              <span>Requested by: <strong>{{ req.requestedBy.fullName }}</strong></span>
+              <span>•</span>
+              <span>{{ req.requestedAt | date:'mediumDate' }}</span>
+            </div>
+          </div>
+          <div class="pending-action" *ngIf="authService.isApprover()">
+            <a [routerLink]="['/approvals']" class="btn btn-primary btn-sm">
+              Review Diff
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Status Breakdown & Audit Preview -->
+    <div class="card column-card">
+      <div class="card-header">
+        <div>
+          <h3>Recent Audit Trail</h3>
+          <p class="section-sub">Latest system modifications and security actions</p>
+        </div>
+        <a *ngIf="authService.isAdmin() || authService.isManager()" routerLink="/audit-logs" class="btn btn-secondary btn-sm">Full Log</a>
+      </div>
+
+      <div *ngIf="recentAuditLogs.length === 0" class="empty-state">
+        <p>No recent activity recorded.</p>
+      </div>
+
+      <div *ngIf="recentAuditLogs.length > 0" class="audit-timeline">
+        <div *ngFor="let log of recentAuditLogs" class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <span class="timeline-action">{{ log.action }}</span>
+              <span class="timeline-time">{{ log.timestamp | date:'shortTime' }}</span>
+            </div>
+            <p class="timeline-details">{{ log.details }}</p>
+            <span class="timeline-actor">By: {{ log.performedBy }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

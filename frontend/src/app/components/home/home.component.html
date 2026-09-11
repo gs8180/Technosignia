@@ -1,0 +1,452 @@
+<div class="landing-page">
+  <!-- Top Navigation Bar for Landing Page -->
+  <header class="landing-nav">
+    <div class="nav-wrapper">
+      <a routerLink="/" class="landing-brand">
+        <div class="brand-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m14 2-5 9 5 9"></path>
+            <path d="M19 12H5"></path>
+          </svg>
+        </div>
+        <div class="brand-name">
+          Contract<span class="highlight">Flow</span>
+          <span class="version-pill">Enterprise</span>
+        </div>
+      </a>
+
+      <div class="nav-links-center">
+        <a href="#workflow" class="nav-anchor">Workflow</a>
+        <a href="#roles" class="nav-anchor">Role Hierarchy</a>
+        <a href="#features" class="nav-anchor">Capabilities</a>
+        <a href="#security" class="nav-anchor">Governance</a>
+      </div>
+
+      <div class="nav-actions">
+        <ng-container *ngIf="authService.isLoggedIn(); else publicNav">
+          <a routerLink="/dashboard" class="btn btn-primary btn-sm">
+            Open Workspace
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </ng-container>
+        <ng-template #publicNav>
+          <a routerLink="/login" class="btn btn-primary btn-sm">
+            Sign In to Portal
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </ng-template>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-bg-orb orb-1"></div>
+    <div class="hero-bg-orb orb-2"></div>
+
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          Next-Gen Legal Contract Lifecycle & Governance Platform
+        </div>
+
+        <h1 class="hero-title">
+          Enterprise Legal Contract <span class="gradient-text">Modification & Governance</span>
+        </h1>
+
+        <p class="hero-description">
+          An audit-grade contract management platform. Seamlessly ingest legal agreements, maintain sequence-controlled clause hierarchies, propose structured amendments with side-by-side visual redlines, and enforce multi-tier approval workflows.
+        </p>
+
+        <div class="hero-buttons">
+          <a routerLink="/login" class="btn btn-primary btn-lg">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <polyline points="10 17 15 12 10 7"></polyline>
+              <line x1="15" y1="12" x2="3" y2="12"></line>
+            </svg>
+            Access ContractFlow Portal
+          </a>
+
+          <a href="#workflow" class="btn btn-secondary btn-lg">
+            Explore Architecture
+          </a>
+        </div>
+
+        <div class="hero-trust-bar">
+          <div class="trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" color="#10b981">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>SOC-2 Type II Compliant</span>
+          </div>
+          <div class="trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" color="#10b981">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Immutable Audit Logs</span>
+          </div>
+          <div class="trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" color="#10b981">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Multi-Tier RBAC</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual: Interactive Mockup Diff Card -->
+      <div class="hero-visual">
+        <div class="visual-card">
+          <div class="visual-header">
+            <div class="visual-meta">
+              <span class="badge badge-active">Active Contract</span>
+              <span class="version-label">v1.1 Snapshot</span>
+            </div>
+            <span class="contract-tag">CNT-2026-001</span>
+          </div>
+
+          <div class="visual-title">
+            <h3>Software Development & SLA Agreement</h3>
+            <p class="visual-sub">Active Clause Modification Review</p>
+          </div>
+
+          <!-- Side-by-Side Diff Box -->
+          <div class="mockup-diff-box">
+            <div class="diff-pane diff-pane-original">
+              <div class="pane-header">
+                <span class="pane-indicator red-dot"></span>
+                <span>Original Clause 1: Payment Terms</span>
+              </div>
+              <div class="pane-text">
+                "Payment must be completed within <span class="highlight-del">30 days</span> of verified invoice receipt via wire transfer."
+              </div>
+            </div>
+
+            <div class="diff-pane diff-pane-proposed">
+              <div class="pane-header">
+                <span class="pane-indicator green-dot"></span>
+                <span>Proposed Revision</span>
+              </div>
+              <div class="pane-text">
+                "Payment must be completed within <span class="highlight-add">45 days</span> of verified invoice receipt via wire transfer."
+              </div>
+            </div>
+          </div>
+
+          <!-- Mockup Review Controls -->
+          <div class="visual-footer">
+            <div class="mock-status">
+              <span class="badge badge-approved">APPROVED BY LEGAL</span>
+              <span class="mock-date">Audit Trail Logged</span>
+            </div>
+            <div class="mock-actions">
+              <a routerLink="/login" class="btn btn-primary btn-sm">
+                Sign In to Review →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impact Metrics Bar -->
+  <section class="metrics-bar-section">
+    <div class="container metrics-wrapper">
+      <div class="metric-item">
+        <span class="metric-number">100%</span>
+        <span class="metric-label">Audit Trail Traceability</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-item">
+        <span class="metric-number">0%</span>
+        <span class="metric-label">Untracked Clause Alterations</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-item">
+        <span class="metric-number">&lt; 1s</span>
+        <span class="metric-label">Side-by-Side Diff Engine</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-item">
+        <span class="metric-number">4 Tiers</span>
+        <span class="metric-label">Role-Based Access Control</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive 5-Step Workflow Section -->
+  <section id="workflow" class="section-workflow">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">End-to-End Architecture</span>
+        <h2>The 5-Stage Contract Modification Workflow</h2>
+        <p>Explore how the platform tracks contracts from initial document ingestion through redline approval and immutable version archiving.</p>
+      </div>
+
+      <!-- Step Navigation Tabs -->
+      <div class="workflow-stepper">
+        <button
+          *ngFor="let step of workflowSteps"
+          (click)="selectStep(step.id)"
+          class="step-pill-btn"
+          [class.active-step]="activeStep === step.id">
+          <span class="step-num">{{ step.id }}</span>
+          <span class="step-text">{{ step.badge }}</span>
+        </button>
+      </div>
+
+      <!-- Active Step Interactive Card Display -->
+      <div class="workflow-detail-card" *ngIf="workflowSteps[activeStep - 1] as step">
+        <div class="detail-left">
+          <span class="step-badge">{{ step.badge }}</span>
+          <h3 class="step-title">{{ step.title }}</h3>
+          <p class="step-description">{{ step.description }}</p>
+          <div class="step-highlight">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>{{ step.highlight }}</span>
+          </div>
+
+          <div class="step-cta-row">
+            <a routerLink="/login" class="btn btn-secondary btn-sm">
+              Sign In to View Process
+            </a>
+          </div>
+        </div>
+
+        <div class="detail-right">
+          <div class="mock-window">
+            <div class="mock-window-bar">
+              <span class="window-dot r"></span>
+              <span class="window-dot y"></span>
+              <span class="window-dot g"></span>
+              <span class="window-title">{{ step.mockContent.contractNo }} — {{ step.mockContent.action }}</span>
+            </div>
+            <div class="mock-window-body">
+              <p class="mock-body-details">{{ step.mockContent.details }}</p>
+
+              <div *ngIf="step.mockContent.original && step.mockContent.proposed" class="mock-mini-diff">
+                <div class="mini-diff-box red">
+                  <span class="mini-label">Original Baseline:</span>
+                  <p>{{ step.mockContent.original }}</p>
+                </div>
+                <div class="mini-diff-box green">
+                  <span class="mini-label">Proposed Amendment:</span>
+                  <p>{{ step.mockContent.proposed }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Role-Based Access Hierarchy Section -->
+  <section id="roles" class="section-roles">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Role-Based Access Control</span>
+        <h2>Enterprise Stakeholder Governance Matrix</h2>
+        <p>ContractFlow enforces strict least-privilege RBAC boundaries across every stage of contract modification.</p>
+      </div>
+
+      <!-- Role Selector Tabs -->
+      <div class="roles-tabs-row">
+        <button
+          *ngFor="let r of rolesList; let i = index"
+          (click)="selectRole(i)"
+          class="role-tab-btn"
+          [class.active-role-tab]="activeRoleIndex === i">
+          <span class="role-tab-name">{{ r.roleName }}</span>
+          <span class="role-tab-badge">{{ r.badge }}</span>
+        </button>
+      </div>
+
+      <!-- Active Role Details Card -->
+      <div class="role-showcase-card" *ngIf="rolesList[activeRoleIndex] as role">
+        <div class="role-card-header">
+          <div class="role-icon-box" [style.background]="role.avatarBg">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div>
+            <h3>{{ role.roleName }}</h3>
+            <p class="role-tagline">{{ role.tagline }}</p>
+          </div>
+        </div>
+
+        <div class="role-responsibilities">
+          <h4>Key Responsibilities & System Permissions:</h4>
+          <ul>
+            <li *ngFor="let item of role.responsibilities">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" color="#10b981">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>{{ item }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="role-governance-box">
+          <div class="gov-meta">
+            <span class="gov-chip">RBAC Policy: Enforced</span>
+            <span class="gov-text">Access is governed by enterprise Single Sign-On and managed by System Administrators.</span>
+          </div>
+          <a routerLink="/login" class="btn btn-primary">
+            Sign In with Enterprise Account →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section id="features" class="section-features">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Enterprise Capabilities</span>
+        <h2>Comprehensive Legal Technology Architecture</h2>
+        <p>Engineered for high reliability, clean architectural separation, and intuitive legal usability.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-indigo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+          <h3>Contract Lifecycle State Machine</h3>
+          <p>Full support for Draft, Active, Expired, and Terminated states with real-time keyword search, status filtering, and metadata validation.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-emerald">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+          </div>
+          <h3>Clause Architecture & Sequencing</h3>
+          <p>Maintain atomic legal clauses with sequence ordering. Re-order clauses dynamically using sequence controls with automatic index rebalancing.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-amber">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3>Side-by-Side Visual Redline Diff</h3>
+          <p>Compare original values directly against proposed amendments with color-coded additions and deletions before legal sign-off.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-sky">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+          <h3>Document Repository</h3>
+          <p>Securely upload PDF, DOCX, and text contract attachments with streaming download, checksum validation, and size limits.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-purple">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+          <h3>Automated Version Snapshots</h3>
+          <p>Ratified approvals automatically increment version tags (e.g. v1.0 → v1.1) and freeze historical snapshots for instant inspection.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-icon bg-rose">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3>Immutable Audit Trail</h3>
+          <p>Every login, contract creation, clause reordering, and approval decision is logged with timestamps, IP address, and actor details.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enterprise CTA Section -->
+  <section id="security" class="section-cta">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Streamline Your Contract Modification Lifecycle</h2>
+        <p>Enable seamless document ingestion, visual redline reviews, and audit-grade legal compliance across your entire enterprise.</p>
+
+        <div class="cta-actions">
+          <a routerLink="/login" class="btn btn-primary btn-lg">
+            Access ContractFlow Portal
+          </a>
+          <a href="#workflow" class="btn btn-secondary btn-lg">
+            Review Architecture
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Landing Footer -->
+  <footer class="landing-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="brand-name">Contract<span class="highlight">Flow</span></div>
+        <p class="footer-sub">Enterprise Legal Contract Document Modification & Governance Platform</p>
+        <div class="enterprise-trust-badges">
+          <span class="trust-badge">SOC-2 Type II Certified</span>
+          <span class="trust-divider">•</span>
+          <span class="trust-badge">256-bit AES Encryption</span>
+          <span class="trust-divider">•</span>
+          <span class="trust-badge">Immutable Audit Logging</span>
+          <span class="trust-divider">•</span>
+          <span class="trust-badge">RBAC Access Control</span>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <a routerLink="/login">Sign In</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#roles">Governance</a>
+        <a href="#features">Capabilities</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Technosignia. All rights reserved. Enterprise Legal Contract Modification System.</p>
+    </div>
+  </footer>
+</div>

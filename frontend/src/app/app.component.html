@@ -1,0 +1,53 @@
+<!-- Authenticated Dashboard Layout with Persistent Side Nav Bar -->
+<div *ngIf="isDashboardView()" class="dashboard-layout-root">
+  <!-- Left Side Navigation Bar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Right Workspace Area -->
+  <div class="workspace-wrapper">
+    <!-- Slim Workspace Top Header -->
+    <header class="workspace-topbar">
+      <div class="topbar-left">
+        <div class="breadcrumbs">
+          <span class="crumb-root">ContractFlow</span>
+          <span class="crumb-separator">/</span>
+          <span class="crumb-current">{{ getPageTitle() }}</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a *ngIf="authService.isAdmin()" routerLink="/users" class="topbar-user topbar-user-link" title="Admin User Management & Self Profile">
+          <div class="topbar-avatar">
+            {{ authService.currentUserValue?.fullName?.charAt(0) || 'U' }}
+          </div>
+          <div class="topbar-user-info">
+            <span class="topbar-name">{{ authService.currentUserValue?.fullName }}</span>
+            <span class="topbar-role">{{ formatRole(authService.currentUserValue?.role) }}</span>
+          </div>
+        </a>
+        <div *ngIf="!authService.isAdmin()" class="topbar-user">
+          <div class="topbar-avatar">
+            {{ authService.currentUserValue?.fullName?.charAt(0) || 'U' }}
+          </div>
+          <div class="topbar-user-info">
+            <span class="topbar-name">{{ authService.currentUserValue?.fullName }}</span>
+            <span class="topbar-role">{{ formatRole(authService.currentUserValue?.role) }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Content Outlet -->
+    <main class="workspace-main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<!-- Public / Non-Dashboard Layout (Landing Page, Login) -->
+<div *ngIf="!isDashboardView()" class="public-layout-root">
+  <app-navbar *ngIf="authService.isLoggedIn()"></app-navbar>
+  <main class="public-main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

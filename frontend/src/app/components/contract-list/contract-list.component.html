@@ -1,0 +1,164 @@
+<div class="container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Contract Management</h1>
+      <p class="page-subtitle">Search, filter, manage, and modify legal agreements</p>
+    </div>
+    <button
+      *ngIf="authService.isManager() || authService.isAdmin()"
+      (click)="openCreateModal()"
+      class="btn btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Create New Contract
+    </button>
+  </div>
+
+  <!-- Filter & Search Toolbar (Task 8) -->
+  <div class="filter-card card">
+    <div class="search-input-box">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        class="form-control with-search-icon"
+        placeholder="Search contracts by title, number, or description..."
+        [(ngModel)]="searchQuery"
+        (input)="onFilterChange()"
+      />
+    </div>
+
+    <div class="filter-dropdown-box">
+      <label class="filter-label">Filter by Status:</label>
+      <select class="form-control select-status" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+        <option value="">All Statuses</option>
+        <option value="DRAFT">Draft</option>
+        <option value="ACTIVE">Active</option>
+        <option value="EXPIRED">Expired</option>
+        <option value="TERMINATED">Terminated</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Contract Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Contract No.</th>
+          <th>Contract Title</th>
+          <th>Version</th>
+          <th>Status</th>
+          <th>Created By</th>
+          <th>Created Date</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="7" class="table-empty">Loading contracts from database...</td>
+        </tr>
+        <tr *ngIf="!loading && contracts.length === 0">
+          <td colspan="7" class="table-empty">
+            No contracts matched your search criteria.
+          </td>
+        </tr>
+        <tr *ngFor="let contract of contracts" class="clickable-row" [routerLink]="['/contracts', contract.id]">
+          <td>
+            <span class="contract-code">{{ contract.contractNumber }}</span>
+          </td>
+          <td>
+            <div class="contract-title-cell">
+              <span class="title-text">{{ contract.title }}</span>
+              <span class="desc-text">{{ contract.description | slice:0:70 }}{{ (contract.description.length > 70) ? '...' : '' }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="version-tag">v{{ contract.currentVersion }}</span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="'badge-' + contract.status.toLowerCase()">
+              {{ contract.status }}
+            </span>
+          </td>
+          <td>{{ contract.createdBy?.fullName || 'System' }}</td>
+          <td>{{ contract.createdAt | date:'mediumDate' }}</td>
+          <td style="text-align: right;">
+            <div class="actions-group">
+              <a [routerLink]="['/contracts', contract.id]" class="btn btn-secondary btn-sm" title="View Details">
+                Open
+              </a>
+              <button
+                *ngIf="authService.isManager() || authService.isAdmin()"
+                (click)="openEditModal(contract, $event)"
+                class="btn btn-secondary btn-sm"
+                title="Edit Contract">
+                Edit
+              </button>
+              <button
+                *ngIf="authService.isAdmin()"
+                (click)="deleteContract(contract.id, $event)"
+                class="btn btn-danger btn-sm"
+                title="Delete Contract">
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create / Edit Contract Modal -->
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? 'Edit Contract' : 'Create New Contract' }}</h3>
+      <button type="button" class="btn-icon" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="modalError" class="error-alert">
+        {{ modalError }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contract Number *</label>
+        <input type="text" class="form-control" [(ngModel)]="formContractNumber" placeholder="e.g. CNT-2026-101" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contract Title *</label>
+        <input type="text" class="form-control" [(ngModel)]="formTitle" placeholder="e.g. Master Services Agreement" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description / Scope of Agreement</label>
+        <textarea class="form-control" [(ngModel)]="formDescription" placeholder="Enter contract description and initial terms..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contract Status</label>
+        <select class="form-control" [(ngModel)]="formStatus">
+          <option value="DRAFT">Draft</option>
+          <option value="ACTIVE">Active</option>
+          <option value="EXPIRED">Expired</option>
+          <option value="TERMINATED">Terminated</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="saveContract()">
+        {{ isEditMode ? 'Save Changes' : 'Create Contract' }}
+      </button>
+    </div>
+  </div>
+</div>

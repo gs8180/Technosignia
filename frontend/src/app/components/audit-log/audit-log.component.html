@@ -1,0 +1,67 @@
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">System Audit Log</h1>
+      <p class="page-subtitle">Complete chronological history of contract actions, modifications, and security events</p>
+    </div>
+  </div>
+
+  <!-- Search Filter -->
+  <div class="card filter-card">
+    <div class="search-input-box">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        class="form-control with-search-icon"
+        placeholder="Filter logs by user, action, or details..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+      />
+    </div>
+  </div>
+
+  <!-- Audit Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Action</th>
+          <th>Performed By</th>
+          <th>Entity</th>
+          <th>Event Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="5" class="table-empty">Loading audit logs...</td>
+        </tr>
+        <tr *ngIf="!loading && filteredLogs.length === 0">
+          <td colspan="5" class="table-empty">No audit events found.</td>
+        </tr>
+        <tr *ngFor="let log of filteredLogs">
+          <td style="white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
+            {{ log.timestamp | date:'yyyy-MM-dd HH:mm:ss' }}
+          </td>
+          <td>
+            <span class="action-tag" [ngClass]="'action-' + log.action.toLowerCase()">
+              {{ log.action }}
+            </span>
+          </td>
+          <td>
+            <strong>{{ log.performedBy }}</strong>
+          </td>
+          <td>
+            <span class="entity-pill">{{ log.entityName }} #{{ log.entityId }}</span>
+          </td>
+          <td class="details-cell">
+            {{ log.details }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
