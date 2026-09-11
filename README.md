@@ -43,3 +43,8 @@ To become a skilled Full Stack Java Developer and build high-quality web applica
 A full-stack digital platform for contract lifecycle management, clause modification proposals, side-by-side diff reviews, multi-level approval workflows, automatic version snapshotting, and audit tracking.
 - **Backend:** Spring Boot 3, Java 21, Spring Security (JWT), MySQL, Hibernate / JPA
 - **Frontend:** Angular 17, TypeScript, Modern CSS3
+
+### 2. [Student Management System](./Student%20Management%20System)
+A full-stack web application for student enrollment, search & pagination, department allocation, and academic records management.
+- **Backend:** Spring Boot, Java 21, Spring Data JPA, MySQL
+- **Frontend:** Thymeleaf, HTML5, CSS3, Bootstrap
